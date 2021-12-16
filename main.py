@@ -7,6 +7,9 @@ take a sheet with event logs from the event viewer and compare different PCs
 
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 os.chdir("D:\\OneDrive\\OneDrive\\Python\\shutdowns\\")
 # df = pd.read_excel("source\\shutdown_table.xlsx")
 excelfile = pd.ExcelFile("source\\shutdown_table.xlsx")
@@ -22,3 +25,15 @@ for sheet in excelfile.sheet_names:
 df.columns = ['Level', 'DateAndTime', 'Source', 'EventID', 'TaskCategory', 'PC']
 df.reset_index(drop=True, inplace=True)
 
+plt.scatter(x=df['DateAndTime'], y=df['PC'])
+
+PC_names = df['PC'].unique()
+
+dfs = {}
+for name in PC_names:
+    dfs[name] = df[df['PC'] == name]
+    
+f, ax = plt.subplots(figsize=(8, 8))
+
+for name, entries_df in dfs.items():
+    ax = sns.kdeplot(entries_df['DateAndTime'], cumulative=True)
